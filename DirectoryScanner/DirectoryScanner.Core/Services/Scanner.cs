@@ -9,18 +9,21 @@ namespace DirectoryScanner.Core.Services
     public class Scanner : IScanner
     {
         private readonly ConcurrentQueue<Node> _nodesToScan = new();
-        
-        public async Task<DirectoryTree> Scan(string path, int threadsCount, CancellationToken cancellationToken)
+        private CancellationTokenSource _cancellationTokenSource;
+
+        public async Task<DirectoryTree> Scan(string path, int threadsCount)
         {
             if (!Directory.Exists(path))
             {
                 throw new DirectoryNotFoundException($"Path: {path}");
             }
 
+            _cancellationTokenSource = new();
+            var cancellationToken = _cancellationTokenSource.Token;
+
             var tree = new DirectoryTree(new Node(path, NodeType.Directory));
             ScanNode(tree.Root);
             var tasks = new List<Task>(threadsCount);
-            var semaphore = new SemaphoreSlim(1, threadsCount);
             var activeThreads = 1;
 
             do
@@ -47,6 +50,8 @@ namespace DirectoryScanner.Core.Services
             SetNodeSize(tree.Root);
             return tree;
         }
+
+        public void Cancel() => _cancellationTokenSource?.Cancel();
 
         private void ScanNode(Node node)
         {
