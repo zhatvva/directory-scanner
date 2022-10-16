@@ -23,6 +23,7 @@ namespace DirectoryScanner.WPFApplication
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new ViewModel();
         }
     }
 }

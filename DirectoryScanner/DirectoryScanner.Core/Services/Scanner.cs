@@ -8,20 +8,30 @@ namespace DirectoryScanner.Core.Services
 {
     public class Scanner : IScanner
     {
-        private readonly ConcurrentQueue<Node> _nodesToScan = new();
+        private ConcurrentQueue<Node> _nodesToScan;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public async Task<DirectoryTree> Scan(string path, int threadsCount)
+        public async Task<DirectoryTree> Scan(string path, int threadsCount, ChildAddedDelegate tracker = null)
         {
             if (!Directory.Exists(path))
             {
                 throw new DirectoryNotFoundException($"Path: {path}");
             }
 
-            _cancellationTokenSource = new();
+            if (threadsCount <= 1)
+            {
+                throw new ArgumentException("Threads count should be at least 2");
+            }
+            
+            _nodesToScan = new ConcurrentQueue<Node>();
+            _cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = _cancellationTokenSource.Token;
 
-            var tree = new DirectoryTree(new Node(path, NodeType.Directory));
+            var tree = new DirectoryTree(new Node(path, path, NodeType.Directory));
+            if (tracker != null)
+            {
+                tree.Root.ChildAddedEvent += tracker;
+            }
             ScanNode(tree.Root);
             var tasks = new List<Task>(threadsCount);
             var activeThreads = 1;
@@ -44,7 +54,7 @@ namespace DirectoryScanner.Core.Services
                     Interlocked.Increment(ref activeThreads);
                 }
             }
-            while (!_nodesToScan.IsEmpty && !cancellationToken.IsCancellationRequested || activeThreads > 1);
+            while (!cancellationToken.IsCancellationRequested && (!_nodesToScan.IsEmpty  || activeThreads > 1));
 
             await Task.WhenAll(tasks);
             SetNodeSize(tree.Root);
@@ -62,7 +72,7 @@ namespace DirectoryScanner.Core.Services
                 var directories = directoryInfo.GetDirectories();
                 foreach (var directory in directories)
                 {
-                    var directoryNode = new Node(directory.FullName, NodeType.Directory);
+                    var directoryNode = new Node(directory.Name, directory.FullName, NodeType.Directory);
                     node.AddChild(directoryNode);
                     _nodesToScan.Enqueue(directoryNode);
                 }
@@ -70,7 +80,7 @@ namespace DirectoryScanner.Core.Services
                 var files = directoryInfo.GetFiles();
                 foreach (var file in files)
                 {
-                    var fileNode = new Node(file.FullName, NodeType.File, file.Length);
+                    var fileNode = new Node(file.Name, file.FullName, NodeType.File, file.Length);
                     node.AddChild(fileNode);
                 }
             }

@@ -9,23 +9,24 @@ namespace DirectoryScanner.Core.Entities
         public string FullPath { get; }
         public long Size { get; internal set; }
         public Exception LoadException { get; internal set; } = null;
-        public IReadOnlyList<Node> Children => _children;
+        public IEnumerable<Node> Children => _children;
+        public event ChildAddedDelegate ChildAddedEvent;
 
         private readonly List<Node> _children = new();
 
-        public Node(string fullPath, NodeType type)
+        public Node(string name, string fullPath, NodeType type)
         {
             if (string.IsNullOrEmpty(fullPath))
             {
                 throw new ArgumentException("Path cannot be null or empty");
             }
 
-            Name = type == NodeType.File ? Path.GetFileName(fullPath) : Path.GetDirectoryName($"{fullPath}\\");
+            Name = name;
             Type = type;
             FullPath = fullPath;
         }
 
-        public Node(string fullPath, NodeType type, long size) : this(fullPath, type)
+        public Node(string name, string fullPath, NodeType type, long size) : this(name, fullPath, type)
         {
             if (size < 0)
             {
@@ -43,6 +44,9 @@ namespace DirectoryScanner.Core.Entities
             }
 
             _children.Add(node);
+            OnChildAdded(node);
         }
+
+        private void OnChildAdded(Node child) => ChildAddedEvent?.Invoke(this, new ChildAddedEventArgs(child));
     }
 }

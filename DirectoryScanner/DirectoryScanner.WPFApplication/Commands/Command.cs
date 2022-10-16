@@ -8,13 +8,10 @@ namespace DirectoryScanner.WPFApplication.Commands
         private readonly Func<object, bool> _canExecute;
         private readonly Action<object> _execute;
 
-        public Command(Func<object, bool> canExecute, Action<object> execute)
+        protected Command(Func<object, bool> canExecute, Action<object> execute)
         {
-            if (canExecute is null) throw new ArgumentNullException(nameof(canExecute));
-            if (execute is null) throw new ArgumentNullException(nameof(execute));
-
-            _canExecute = canExecute;
-            _execute = execute;
+            _canExecute = canExecute ?? throw new ArgumentNullException(nameof(canExecute));
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
         }
             
         public virtual event EventHandler CanExecuteChanged

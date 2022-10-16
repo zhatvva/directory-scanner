@@ -6,12 +6,7 @@
 
         public DirectoryTree(Node root)
         {
-            if (root is null)
-            {
-                throw new ArgumentNullException(nameof(root));
-            }
-
-            Root = root;
+            Root = root ?? throw new ArgumentNullException(nameof(root));
         }
     }
 }

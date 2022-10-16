@@ -4,9 +4,41 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DirectoryScanner.WPFApplication"
+        xmlns:self="clr-namespace:DirectoryScanner.WPFApplication.ViewModels"
+        xmlns:viewmodels="clr-namespace:DirectoryScanner.WPFApplication"
+        d:DataContext="{d:DesignInstance Type=viewmodels:ViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <Button Content="Select folder" HorizontalAlignment="Left" Margin="47,35,0,0" VerticalAlignment="Top" Height="50" Width="109" Command="{Binding Path=SetDirectoryCommand}"/>
+        <Button Content="Cancel" HorizontalAlignment="Left" Margin="47,113,0,0" VerticalAlignment="Top" Height="52" Width="109" Command="{Binding Path=CancelDirectoryScanningCommand}"/>
+        <TreeView Margin="174,10,10,10" ItemsSource="{Binding DirectoryView}">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type self:DirectoryNodeView}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/Assets/Folder.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text=" | "/>
+                        <TextBlock Text="{Binding SizeInBytes}"/>
+                        <TextBlock Text=" bytes"/>
+                        <TextBlock Text=" | "/>
+                        <TextBlock Text="{Binding SizeInPercents, StringFormat=N2}"/>
+                        <TextBlock Text="%"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type self:FileNodeView}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/Assets/File.png" Width="15" Height="15" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text=" | "/>
+                        <TextBlock Text="{Binding SizeInBytes}"/>
+                        <TextBlock Text=" bytes"/>
+                        <TextBlock Text=" | "/>
+                        <TextBlock Text="{Binding SizeInPercents, StringFormat=N2}"/>
+                        <TextBlock Text="%"/>
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
     </Grid>
 </Window>
