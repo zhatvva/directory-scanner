@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using DirectoryScanner.Core.Interfaces;
@@ -15,8 +13,8 @@ namespace DirectoryScanner.WPFApplication
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private ObservableCollection<NodeView> _directoryView;
-        public ObservableCollection<NodeView> DirectoryView
+        private BindingList<NodeView> _directoryView;
+        public BindingList<NodeView> DirectoryView
         {
             get => _directoryView;
             private set
@@ -38,9 +36,8 @@ namespace DirectoryScanner.WPFApplication
                     var isFolderSelected = dialog.ShowDialog().GetValueOrDefault();
                     if (isFolderSelected)
                     {
-                        var name = Path.GetDirectoryName(Path.Combine(dialog.SelectedPath, "\\"));
-                        var directoryNode = new DirectoryNodeView(name, 0, 100);
-                        DirectoryView = new ObservableCollection<NodeView>() { directoryNode };
+                        var directoryNode = new DirectoryNodeView("none", 0, 100);
+                        DirectoryView = new BindingList<NodeView>() { directoryNode };
                         var scanResult = await _scanner.Scan(dialog.SelectedPath, 100, 
                             directoryNode.ChildAddedTracker);
                         directoryNode.Name = scanResult.Root.Name;
