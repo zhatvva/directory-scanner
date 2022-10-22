@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
-namespace DirectoryScanner.WPFApplication.ViewModels
+﻿namespace DirectoryScanner.WPFApplication.ViewModels
 {
     internal class NodeView 
     {
@@ -18,7 +14,5 @@ namespace DirectoryScanner.WPFApplication.ViewModels
             SizeInBytes = sizeInBytes;
             SizeInPercents = sizeInPercents;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

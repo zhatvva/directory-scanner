@@ -13,6 +13,13 @@ namespace DirectoryScanner.Core.Services
 
         public async Task<DirectoryTree> Scan(string path, int threadsCount)
         {
+            if (File.Exists(path))
+            {
+                var fileInfo = new FileInfo(path);
+                return new DirectoryTree(new Node(fileInfo.Name, fileInfo.FullName, NodeType.File,
+                    fileInfo.Length));
+            }
+
             if (!Directory.Exists(path))
             {
                 throw new DirectoryNotFoundException($"Path: {path}");
