@@ -25,6 +25,7 @@ namespace DirectoryScanner.WPFApplication
         }
 
         private readonly IScanner _scanner = new Scanner();
+        
         private ICommand _setDirectoryCommand;
         public ICommand SetDirectoryCommand
         {
@@ -36,13 +37,8 @@ namespace DirectoryScanner.WPFApplication
                     var isFolderSelected = dialog.ShowDialog().GetValueOrDefault();
                     if (isFolderSelected)
                     {
-                        var directoryNode = new DirectoryNodeView("none", 0, 100);
-                        DirectoryView = new BindingList<NodeView>() { directoryNode };
-                        var scanResult = await _scanner.Scan(dialog.SelectedPath, 100, 
-                            directoryNode.ChildAddedTracker);
-                        directoryNode.Name = scanResult.Root.Name;
-                        directoryNode.SizeInBytes = scanResult.Root.Size;
-                        DirectoryView.Add(scanResult.ToViewModel());
+                        var scanResult = await _scanner.Scan(dialog.SelectedPath, 100);
+                        DirectoryView = new BindingList<NodeView>() { (scanResult.ToViewModel()) };
                     }
                 });
                 return _setDirectoryCommand;

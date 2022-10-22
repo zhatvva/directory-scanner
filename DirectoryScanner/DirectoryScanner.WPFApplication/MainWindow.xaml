@@ -10,9 +10,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button Content="Select folder" HorizontalAlignment="Left" Margin="47,35,0,0" VerticalAlignment="Top" Height="50" Width="109" Command="{Binding Path=SetDirectoryCommand}"/>
-        <Button Content="Cancel" HorizontalAlignment="Left" Margin="47,113,0,0" VerticalAlignment="Top" Height="52" Width="109" Command="{Binding Path=CancelDirectoryScanningCommand}"/>
-        <TreeView Name="DirectoryTreeView" Margin="174,10,10,10" ItemsSource="{Binding Path=DirectoryView}">
+        <Button Content="Select folder" Margin="10,0,0,10" Command="{Binding Path=SetDirectoryCommand}" Height="50" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="385"/>
+        <Button Content="Cancel" Margin="0,0,10,10" Command="{Binding Path=CancelDirectoryScanningCommand}" Height="50" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="390"/>
+        <TreeView Name="DirectoryTreeView" Margin="10,10,10,65" ItemsSource="{Binding Path=DirectoryView}">
             <TreeView.Resources>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}" DataType="{x:Type self:DirectoryNodeView}">
                     <StackPanel Orientation="Horizontal">

@@ -11,7 +11,7 @@ namespace DirectoryScanner.Core.Services
         private ConcurrentQueue<Node> _nodesToScan;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public async Task<DirectoryTree> Scan(string path, int threadsCount, ChildAddedDelegate tracker = null)
+        public async Task<DirectoryTree> Scan(string path, int threadsCount)
         {
             if (!Directory.Exists(path))
             {
@@ -28,10 +28,6 @@ namespace DirectoryScanner.Core.Services
             var cancellationToken = _cancellationTokenSource.Token;
 
             var tree = new DirectoryTree(new Node(path, path, NodeType.Directory));
-            if (tracker != null)
-            {
-                tree.Root.ChildAddedEvent += tracker;
-            }
             ScanNode(tree.Root);
             var tasks = new List<Task>(threadsCount);
             var activeThreads = 1;
@@ -54,7 +50,7 @@ namespace DirectoryScanner.Core.Services
                     Interlocked.Increment(ref activeThreads);
                 }
             }
-            while (!cancellationToken.IsCancellationRequested && (!_nodesToScan.IsEmpty  || activeThreads > 1));
+            while (!cancellationToken.IsCancellationRequested && (activeThreads > 1 || !_nodesToScan.IsEmpty));
 
             await Task.WhenAll(tasks);
             SetNodeSize(tree.Root);

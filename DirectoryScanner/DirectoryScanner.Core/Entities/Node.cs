@@ -10,7 +10,6 @@ namespace DirectoryScanner.Core.Entities
         public long Size { get; internal set; }
         public Exception LoadException { get; internal set; } = null;
         public IEnumerable<Node> Children => _children;
-        public event ChildAddedDelegate ChildAddedEvent;
 
         private readonly List<Node> _children = new();
 
@@ -44,9 +43,6 @@ namespace DirectoryScanner.Core.Entities
             }
 
             _children.Add(node);
-            OnChildAdded(node);
         }
-
-        private void OnChildAdded(Node child) => ChildAddedEvent?.Invoke(this, new ChildAddedEventArgs(child));
     }
 }
